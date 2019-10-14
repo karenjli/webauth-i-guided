@@ -34,7 +34,7 @@ server.post("/api/login", (req, res) => {
   Users.findBy({ username })
     .first()
     .then(user => {
-      if (user) {
+      if (user && bcrypt.compareSync(password, user.password)) {
         res.status(200).json({ message: `Welcome ${user.username}!` });
       } else {
         res.status(401).json({ message: "Invalid Credentials" });
@@ -45,14 +45,38 @@ server.post("/api/login", (req, res) => {
     });
 });
 
-server.get("/api/users", (req, res) => {
-  const header = req.header;
+server.get("/api/users", protected, (req, res) => {
   Users.find()
     .then(users => {
-      res.json(users);
+      res.json({ users });
     })
     .catch(err => res.send(err));
 });
+
+server.get("/hash", (req, res) => {
+  const password = req.headers.authorization;
+  const hash = bcrypt.hashSync(password, 14);
+  res.status(200).json({ hash: hash });
+});
+
+function protected(req, res, next) {
+  const { username, password } = req.headers;
+
+  if (username && password) {
+    Users.findBy({ username })
+      .first()
+      .then(user => {
+        if (user && bcrypt.compareSync(password, user.password)) {
+          next();
+        } else {
+          res.status(401).json({ message: "Invalid Credentials" });
+        }
+      })
+      .catch(error => {
+        res.status(500).json({ message: "Unepected error from fetching data" });
+      });
+  }
+}
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => console.log(`\n** Running on port ${port} **\n`));
