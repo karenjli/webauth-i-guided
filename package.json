@@ -19,5 +19,14 @@
   },
   "devDependencies": {
     "nodemon": "^1.19.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karenjli/webauth-i-guided.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/karenjli/webauth-i-guided/issues"
+  },
+  "homepage": "https://github.com/karenjli/webauth-i-guided#readme"
 }
